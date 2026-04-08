@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parish Liturgy Video Reviewer</title>
+    <style>
+        :root {
+            --primary: #5b2c6f;
+            --primary-light: #7d3c98;
+            --primary-dark: #4a235a;
+            --accent: #c0392b;
+            --gold: #d4ac0d;
+            --bg: #fdf2e9;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --border: #d5d8dc;
+            --success: #27ae60;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary), var(--primary-light));
+            color: white;
+            padding: 1.25rem 2rem;
+            box-shadow: 0 4px 16px rgba(91,44,111,0.3);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        header .cross { font-size: 2rem; color: var(--gold); }
+        header h1 { font-size: 1.5rem; font-weight: 600; }
+        header p { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+
+        .link-input-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .link-input-section label { font-weight: 600; font-size: 0.95rem; white-space: nowrap; }
+
+        .link-input-section input {
+            flex: 1; min-width: 250px; padding: 0.7rem 1rem;
+            border: 2px solid var(--border); border-radius: 8px;
+            font-size: 0.95rem; transition: border-color 0.2s;
+        }
+
+        .link-input-section input:focus { outline: none; border-color: var(--primary); }
+
+        .btn {
+            padding: 0.7rem 1.5rem; border: none; border-radius: 8px;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-sm { padding: 0.45rem 0.9rem; font-size: 0.82rem; }
+        .btn-whatsapp { background: #25D366; color: white; font-weight: 700; }
+        .btn-whatsapp:hover { background: #1da851; transform: translateY(-1px); }
+        .btn-danger { background: var(--accent); color: white; }
+        .btn-danger:hover { background: #a93226; }
+
+        .main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr; } }
+
+        .panel {
+            background: var(--card-bg); border-radius: 12px;
+            box-shadow: var(--shadow); overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white; padding: 0.85rem 1.25rem; font-weight: 600; font-size: 0.95rem;
+            display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+        }
+
+        .panel-body { padding: 1.25rem; flex: 1; overflow-y: auto; }
+
+        .video-container {
+            position: relative; width: 100%; padding-top: 56.25%;
+            background: #1a1a2e; border-radius: 8px; overflow: hidden; margin-bottom: 1rem;
+        }
+
+        .video-container iframe, .video-container video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+        }
+
+        .video-placeholder {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; color: #aaa; gap: 0.75rem;
+        }
+
+        .video-placeholder .icon-big { font-size: 3rem; opacity: 0.4; }
+
+        .current-time-display {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 0.75rem 1rem; background: #f8f4fc;
+            border-radius: 8px; border: 1px solid #e8daef;
+            font-family: 'Courier New', monospace;
+        }
+
+        .current-time-display .time { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        .current-time-display .label { font-size: 0.8rem; color: var(--text-light); font-family: 'Segoe UI', sans-serif; }
+
+        .remark-input-area { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+
+        .remark-input-area textarea {
+            flex: 1; padding: 0.7rem 1rem; border: 2px solid var(--border);
+            border-radius: 8px; font-size: 0.9rem; font-family: inherit;
+            resize: vertical; min-height: 60px; transition: border-color 0.2s;
+        }
+
+        .remark-input-area textarea:focus { outline: none; border-color: var(--primary); }
+
+        .remarks-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .remark-item {
+            display: flex; align-items: flex-start; gap: 0.75rem;
+            padding: 0.75rem; background: #fafafa; border-radius: 8px;
+            border-left: 3px solid var(--primary); transition: background 0.15s;
+        }
+
+        .remark-item:hover { background: #f4f0f7; }
+        .remark-number { font-weight: 700; color: var(--primary); font-size: 0.85rem; min-width: 1.5rem; }
+
+        .remark-timestamp {
+            font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--accent);
+            background: #fdecea; padding: 2px 8px; border-radius: 4px;
+            cursor: pointer; white-space: nowrap; font-weight: 600;
+        }
+
+        .remark-timestamp:hover { background: var(--accent); color: white; }
+        .remark-text { flex: 1; font-size: 0.9rem; line-height: 1.4; }
+
+        .remark-actions button {
+            background: none; border: none; cursor: pointer; font-size: 0.85rem;
+            padding: 2px 6px; border-radius: 4px; opacity: 0.5; transition: all 0.15s;
+        }
+
+        .remark-actions button:hover { opacity: 1; background: #eee; }
+
+        .copy-bar {
+            display: flex; align-items: center; gap: 0.75rem;
+            margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);
+        }
+
+        .transcript-textarea {
+            width: 100%; min-height: 200px; padding: 1rem;
+            border: 2px solid var(--border); border-radius: 8px;
+            font-size: 0.88rem; font-family: inherit; line-height: 1.6;
+            resize: vertical; transition: border-color 0.2s;
+        }
+
+        .transcript-textarea:focus { outline: none; border-color: var(--primary); }
+
+        .trimmed-output {
+            background: #f8f9fa; border: 2px solid var(--gold); border-radius: 8px;
+            padding: 1rem; margin-top: 1rem; white-space: pre-wrap;
+            font-size: 0.88rem; line-height: 1.6; max-height: 400px; overflow-y: auto;
+        }
+
+        .trimmed-output .label-badge {
+            display: inline-block; background: var(--gold); color: var(--primary-dark);
+            font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 4px;
+            margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .status-bar {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.82rem; color: var(--text-light); margin-top: 0.75rem;
+        }
+
+        .status-bar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+
+        .trim-markers {
+            display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem;
+            padding: 0.75rem; background: #fef9e7; border-radius: 8px;
+            border: 1px solid #f9e79f; font-size: 0.82rem;
+        }
+
+        .trim-markers strong { color: var(--primary-dark); }
+
+        .custom-marker-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem; }
+
+        .custom-marker-inputs input {
+            padding: 0.45rem 0.7rem; border: 1px solid var(--border);
+            border-radius: 6px; font-size: 0.82rem;
+        }
+
+        .custom-marker-inputs input:focus { outline: none; border-color: var(--primary); }
+
+        .empty-state { text-align: center; padding: 2rem; color: var(--text-light); }
+        .empty-state .icon-big { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.3; }
+        .error-msg { color: var(--accent); font-size: 0.85rem; margin-top: 0.5rem; }
+        .bottom-panels { margin-top: 1.5rem; }
+
+        kbd {
+            background: #eee; border: 1px solid #ccc; border-radius: 3px;
+            padding: 1px 6px; font-size: 0.78rem; font-family: 'Courier New', monospace; color: #555;
+        }
+
+        .shortcuts-hint { font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; }
+
+        .toast {
+            position: fixed; bottom: 2rem; right: 2rem; background: var(--primary);
+            color: white; padding: 0.85rem 1.5rem; border-radius: 8px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.2); font-size: 0.9rem; font-weight: 500;
+            transform: translateY(120%); transition: transform 0.3s ease; z-index: 1000;
+        }
+
+        .toast.show { transform: translateY(0); }
+
+        /* New styles for trim mode tabs */
+        .trim-tabs {
+            display: flex; gap: 0; margin-bottom: 1rem; border-radius: 8px; overflow: hidden;
+            border: 2px solid var(--primary);
+        }
+        .trim-tab {
+            flex: 1; padding: 0.6rem 1rem; text-align: center; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600; transition: all 0.2s;
+            background: white; color: var(--primary); border: none;
+        }
+        .trim-tab.active { background: var(--primary); color: white; }
+        .trim-tab:hover:not(.active) { background: #f4f0f7; }
+        .trim-mode-panel { display: none; }
+        .trim-mode-panel.active { display: block; }
+
+        .debug-box {
+            background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px;
+            padding: 0.75rem; margin-top: 0.75rem; font-size: 0.8rem;
+            font-family: 'Courier New', monospace; max-height: 150px;
+            overflow-y: auto; color: #555;
+        }
+
+        .highlight-found { background: #abebc6; padding: 1px 4px; border-radius: 2px; }
+        .highlight-extracted { background: #f9e79f; }
+
+        .manual-trim-row {
+            display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap; margin-bottom: 0.75rem;
+        }
+        .manual-trim-row label { font-size: 0.82rem; font-weight: 600; color: var(--primary-dark); }
+        .manual-trim-row input {
+            width: 100px; padding: 0.45rem 0.7rem; border: 2px solid var(--border);
+            border-radius: 6px; font-size: 0.88rem; text-align: center;
+        }
+        .manual-trim-row input:focus { outline: none; border-color: var(--primary); }
+
+        .char-count {
+            font-size: 0.78rem; color: var(--text-light); text-align: right; margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <span class="cross">✝</span>
+    <div>
+        <h1>Parish Liturgy Video Reviewer</h1>
+        <p>Review daily liturgy videos · Compile timestamped remarks · Extract homily transcripts</p>
+    </div>
+</header>
+
+<div class="container">
+    <div class="link-input-section">
+        <label>📎 Dropbox Link:</label>
+        <input type="text" id="dropboxLink" placeholder="Paste your Dropbox video link here..." />
+        <button class="btn btn-primary" onclick="loadVideo()">▶ Load Video</button>
+    </div>
+
+    <div class="main-layout">
+        <div class="panel">
+            <div class="panel-header">
+                <span>🎬 Video Player</span>
+                <span id="videoStatus" style="font-size:0.8rem; opacity:0.8;">No video loaded</span>
+            </div>
+            <div class="panel-body">
+                <div class="video-container" id="videoContainer">
+                    <div class="video-placeholder" id="videoPlaceholder">
+                        <span class="icon-big">🎥</span>
+                        <p>Paste a Dropbox link above and click <strong>Load Video</strong></p>
+                    </div>
+                </div>
+                <div class="current-time-display">
+                    <div>
+                        <div class="label">CURRENT TIME</div>
+                        <div class="time" id="currentTimeDisplay">00:00</div>
+                    </div>
+                    <div style="flex:1;"></div>
+                    <button class="btn btn-sm btn-outline" onclick="insertTimestamp()">⏱ Grab Timestamp</button>
+                </div>
+                <div class="shortcuts-hint" style="margin-top:0.75rem;">
+                    💡 <kbd>Ctrl</kbd>+<kbd>Enter</kbd> add remark · <kbd>Ctrl</kbd>+<kbd>T</kbd> grab timestamp
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>📝 Remarks</span>
+                <span style="font-size:0.8rem; opacity:0.8;" id="remarkCount">0 remarks</span>
+            </div>
+            <div class="panel-body">
+                <div class="remark-input-area">
+                    <textarea id="remarkInput" placeholder="Type your remark here... (Ctrl+Enter to add)" rows="2"></textarea>
+                    <div style="display:flex; flex-direction:column; gap:0.35rem;">
+                        <button class="btn btn-primary btn-sm" onclick="addRemark()">+ Add</button>
+                        <button class="btn btn-outline btn-sm" onclick="clearRemarks()">🗑</button>
+                    </div>
+                </div>
+                <ol class="remarks-list" id="remarksList"></ol>
+                <div class="empty-state" id="remarksEmpty">
+                    <div class="icon-big">📋</div>
+                    <p>No remarks yet. Start reviewing!</p>
+                </div>
+                <div class="copy-bar" id="copyBar" style="display:none;">
+                    <button class="btn btn-whatsapp" onclick="copyRemarks()">📋 Copy to WhatsApp</button>
+                    <span style="font-size:0.82rem; color:var(--text-light);" id="copyStatus"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-panels">
+        <div class="panel">
+            <div class="panel-header">
+                <span>📜 Transcript Trimmer — Extract Homily</span>
+                <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;" onclick="activeTrimmingAction()">✂ Trim</button>
+            </div>
+            <div class="panel-body">
+                <!-- Trim mode tabs -->
+                <div class="trim-tabs">
+                    <button class="trim-tab active" onclick="switchTrimMode('markers')">🔖 By Markers</button>
+                    <button class="trim-tab" onclick="switchTrimMode('lines')">📏 By Line Numbers</button>
+                    <button class="trim-tab" onclick="switchTrimMode('selection')">✋ Manual Select</button>
+                </div>
+
+                <!-- MODE 1: Marker-based -->
+                <div class="trim-mode-panel active" id="trimMode_markers">
+                    <div class="trim-markers">
+                        <div><strong>Start marker:</strong> Text <em>after</em> this phrase is kept</div>
+                        <div><strong>End marker:</strong> Text <em>before</em> this phrase is kept</div>
+                        <div style="margin-top:0.5rem;">
+                            <div class="custom-marker-inputs">
+                                <input type="text" id="startMarker" value="the gospel of the lord" placeholder="Start phrase..." />
+                                <input type="text" id="endMarker" value="our father who art in heaven" placeholder="End phrase..." />
+                            </div>
+                        </div>
+                        <div style="margin-top:0.5rem; font-size:0.78rem; color:var(--text-light);">
+                            💡 Matching is case-insensitive and ignores extra spaces. You can use partial phrases.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODE 2: Line numbers -->
+                <div class="trim-mode-panel" id="trimMode_lines">
+                    <div class="trim-markers">
+                        <div><strong>Extract by line numbers:</strong></div>
+                        <div class="manual-trim-row" style="margin-top:0.5rem;">
+                            <div>
+                                <label>From line:</label><br>
+                                <input type="number" id="lineStart" value="1" min="1" />
+                            </div>
+                            <div>
+                                <label>To line:</label><br>
+                                <input type="number" id="lineEnd" value="50" min="1" />
+                            </div>
+                            <button class="btn btn-sm btn-outline" onclick="countLines()">📊 Count Lines</button>
+                        </div>
+                        <div id="lineCountInfo" style="font-size:0.78rem; color:var(--text-light);"></div>
+                    </div>
+                </div>
+
+                <!-- MODE 3: Manual selection -->
+                <div class="trim-mode-panel" id="trimMode_selection">
+                    <div class="trim-markers">
+                        <div><strong>Manual selection:</strong> Highlight text in the box below, then click "Trim Selected"</div>
+                        <div style="font-size:0.78rem; color:var(--text-light); margin-top:0.3rem;">
+                            💡 Select (highlight) exactly the part you want to extract, then click the button.
+                        </div>
+                    </div>
+                </div>
+
+                <textarea class="transcript-textarea" id="transcriptInput" placeholder="Paste the full Dropbox transcript here..."></textarea>
+                <div class="char-count" id="charCount">0 characters · 0 words · 0 lines</div>
+
+                <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap;">
+                    <button class="btn btn-primary btn-sm" onclick="activeTrimmingAction()">✂ Trim Transcript</button>
+                    <button class="btn btn-outline btn-sm" onclick="copyTrimmed()">📋 Copy Trimmed</button>
+                    <button class="btn btn-sm" style="background:#eee;color:#555;" onclick="previewMarkers()">🔍 Preview Matches</button>
+                    <button class="btn btn-sm btn-danger" style="margin-left:auto;" onclick="clearTranscript()">🗑 Clear</button>
+                </div>
+
+                <div id="debugBox" class="debug-box" style="display:none;"></div>
+                <div id="trimmedOutput" style="display:none;" class="trimmed-output">
+                    <div class="label-badge">✝ Homily Section</div>
+                    <div id="trimmedText"></div>
+                </div>
+                <div id="trimError" class="error-msg"></div>
+                <div class="status-bar" id="trimStatus" style="display:none;">
+                    <span class="dot"></span>
+                    <span id="trimStatusText"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    let remarks = [];
+    let currentVideoTime = 0;
+    let videoElement = null;
+    let currentTrimMode = 'markers';
+
+    // ─── Trim Mode Switching ───
+    function switchTrimMode(mode) {
+        currentTrimMode = mode;
+        document.querySelectorAll('.trim-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.trim-mode-panel').forEach(p => p.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById(`trimMode_${mode}`).classList.add('active');
+    }
+
+    function activeTrimmingAction() {
+        if (currentTrimMode === 'markers') trimByMarkers();
+        else if (currentTrimMode === 'lines') trimByLines();
+        else if (currentTrimMode === 'selection') trimBySelection();
+    }
+
+    // ─── Transcript character/word counter ───
+    document.addEventListener('DOMContentLoaded', () => {
+        const ta = document.getElementById('transcriptInput');
+        ta.addEventListener('input', updateCharCount);
+    });
+
+    function updateCharCount() {
+        const raw = document.getElementById('transcriptInput').value;
+        const chars = raw.length;
+        const words = raw.trim() ? raw.trim().split(/\s+/).length : 0;
+        const lines = raw ? raw.split(/\r?\n/).length : 0;
+        document.getElementById('charCount').textContent = `${chars} characters · ${words} words · ${lines} lines`;
+    }
+
+    // ─── TRIM MODE 1: By Markers (FIXED) ───
+    function normalizeText(text) {
+        return text.toLowerCase().replace(/[\u2018\u2019\u201C\u201D]/g, "'").replace(/\s+/g, ' ').trim();
+    }
+
+    function fuzzyIndexOf(haystack, needle) {
+        // Normalize both strings for comparison
+        const normHay = normalizeText(haystack);
+        const normNeedle = normalizeText(needle);
+
+        const idx = normHay.indexOf(normNeedle);
+        if (idx === -1) return -1;
+
+        // Map back to original string position
+        // Walk through original string counting normalized chars
+        let normPos = 0;
+        let origPos = 0;
+        const origLower = haystack.toLowerCase();
+
+        // Build a mapping: for each position in normalized string, what's the original position
+        let normToOrig = [];
+        for (let i = 0; i < haystack.length; i++) {
+            const ch = origLower[i];
+            if (/\s/.test(ch)) {
+                // Check if this starts a multi-space sequence
+                if (i === 0 || !/\s/.test(origLower[i - 1])) {
+                    normToOrig.push(i);
+                }
+                // else skip (collapsed space)
+            } else {
+                normToOrig.push(i);
+            }
+        }
+
+        return normToOrig[idx] !== undefined ? normToOrig[idx] : idx;
+    }
+
+    function trimByMarkers() {
+        const raw = document.getElementById('transcriptInput').value;
+        const startMarker = document.getElementById('startMarker').value.trim();
+        const endMarker = document.getElementById('endMarker').value.trim();
+        const errorEl = document.getElementById('trimError');
+        const outputEl = document.getElementById('trimmedOutput');
+        const textEl = document.getElementById('trimmedText');
+        const statusEl = document.getElementById('trimStatus');
+        const debugEl = document.getElementById('debugBox');
+
+        errorEl.textContent = '';
+        outputEl.style.display = 'none';
+        statusEl.style.display = 'none';
+        debugEl.style.display = 'none';
+
+        if (!raw.trim()) { errorEl.textContent = '⚠ Paste a transcript first.'; return; }
+        if (!startMarker) { errorEl.textContent = '⚠ Enter a start marker.'; return; }
+        if (!endMarker) { errorEl.textContent = '⚠ Enter an end marker.'; return; }
+
+        // Normalize for matching
+        const normRaw = normalizeText(raw);
+        const normStart = normalizeText(startMarker);
+        const normEnd = normalizeText(endMarker);
+
+        // Find start marker
+        const startMatchIdx = normRaw.indexOf(normStart);
+        if (startMatchIdx === -1) {
+            errorEl.textContent = `⚠ Start marker not found: "${startMarker}"`;
+            showDebugInfo(raw, startMarker, endMarker);
+            return;
+        }
+
+        // Content begins AFTER the start marker phrase
+        const contentStartNorm = startMatchIdx + normStart.length;
+
+        // Find end marker AFTER the start marker
+        const endMatchIdx = normRaw.indexOf(normEnd, contentStartNorm);
+        if (endMatchIdx === -1) {
+            errorEl.textContent = `⚠ End marker not found after start marker: "${endMarker}"`;
+            showDebugInfo(raw, startMarker, endMarker);
+            return;
+        }
+
+        // Now map normalized positions back to original text
+        // We'll use a simpler approach: search in the original text case-insensitively with flexible spacing
+        const startRegex = new RegExp(escapeRegex(normStart).replace(/ /g, '\\s+'), 'i');
+        const startMatch = raw.match(startRegex);
+
+        if (!startMatch) {
+            errorEl.textContent = `⚠ Start marker not found (regex): "${startMarker}"`;
+            return;
+        }
+
+        const origStartEnd = startMatch.index + startMatch[0].length;
+
+        const remainingText = raw.substring(origStartEnd);
+        const endRegex = new RegExp(escapeRegex(normEnd).replace(/ /g, '\\s+'), 'i');
+        const endMatch = remainingText.match(endRegex);
+
+        if (!endMatch) {
+            errorEl.textContent = `⚠ End marker not found after start: "${endMarker}"`;
+            return;
+        }
+
+        const trimmed = remainingText.substring(0, endMatch.index).trim();
+
+        if (!trimmed) {
+            errorEl.textContent = '⚠ No content found between the two markers.';
+            return;
+        }
+
+        displayTrimmedResult(trimmed);
+    }
+
+    function escapeRegex(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function showDebugInfo(raw, startMarker, endMarker) {
+        const debugEl = document.getElementById('debugBox');
+        const normRaw = normalizeText(raw);
+        const first200 = normRaw.substring(0, 300);
+        const last200 = normRaw.substring(Math.max(0, normRaw.length - 300));
+
+        debugEl.innerHTML = `
+            <strong>🔍 Debug Info — Why markers weren't found:</strong><br><br>
+            <strong>Looking for start:</strong> "${escapeHtml(normalizeText(startMarker))}"<br>
+            <strong>Looking for end:</strong> "${escapeHtml(normalizeText(endMarker))}"<br><br>
+            <strong>First 300 chars (normalized):</strong><br>
+            "${escapeHtml(first200)}"<br><br>
+            <strong>Last 300 chars (normalized):</strong><br>
+            "${escapeHtml(last200)}"<br><br>
+            <em>Tip: Copy a few words from the transcript and paste them as your marker.</em>
+        `;
+        debugEl.style.display = 'block';
+    }
+
+    // ─── TRIM MODE 2: By Line Numbers ───
+    function countLines() {
+        const raw = document.getElementById('transcriptInput').value;
+        if (!raw.trim()) { document.getElementById('lineCountInfo').textContent = 'Paste a transcript first.'; return; }
+        const lines = raw.split(/\r?\n/);
+        document.getElementById('lineCountInfo').textContent = `Total lines: ${lines.length}`;
+        document.getElementById('lineEnd').value = lines.length;
+    }
+
+    function trimByLines() {
+        const raw = document.getElementById('transcriptInput').value;
+        const errorEl = document.getElementById('trimError');
+        errorEl.textContent = '';
+
+        if (!raw.trim()) { errorEl.textContent = '⚠ Paste a transcript first.'; return; }
+
+        const lines = raw.split(/\r?\n/);
+        const start = Math.max(1, parseInt(document.getElementById('lineStart').value) || 1);
+        const end = Math.min(lines.length, parseInt(document.getElementById('lineEnd').value) || lines.length);
+
+        if (start > end) { errorEl.textContent = `⚠ Start line (${start}) is after end line (${end}).`; return; }
+
+        const trimmed = lines.slice(start - 1, end).join('\n').trim();
+        if (!trimmed) { errorEl.textContent = '⚠ Selected range is empty.'; return; }
+
+        displayTrimmedResult(trimmed);
+    }
+
+    // ─── TRIM MODE 3: Manual Selection ───
+    function trimBySelection() {
+        const ta = document.getElementById('transcriptInput');
+        const errorEl = document.getElementById('trimError');
+        errorEl.textContent = '';
+
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+
+        if (start === end) {
+            errorEl.textContent = '⚠ No text selected. Highlight the part you want in the transcript box, then click Trim.';
+            return;
+        }
+
+        const trimmed = ta.value.substring(start, end).trim();
+        if (!trimmed) { errorEl.textContent = '⚠ Selection is empty.'; return; }
+
+        displayTrimmedResult(trimmed);
+    }
+
+    // ─── Shared result display ───
+    function displayTrimmedResult(trimmed) {
+        const outputEl = document.getElementById('trimmedOutput');
+        const textEl = document.getElementById('trimmedText');
+        const statusEl = document.getElementById('trimStatus');
+        const errorEl = document.getElementById('trimError');
+        const debugEl = document.getElementById('debugBox');
+
+        errorEl.textContent = '';
+        debugEl.style.display = 'none';
+
+        textEl.textContent = trimmed;
+        outputEl.style.display = 'block';
+        statusEl.style.display = 'flex';
+
+        const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+        document.getElementById('trimStatusText').textContent = `${wordCount} words extracted · ${trimmed.length} characters`;
+        showToast('Transcript trimmed successfully!');
+    }
+
+    // ─── Preview Markers ───
+    function previewMarkers() {
+        const raw = document.getElementById('transcriptInput').value;
+        const startMarker = document.getElementById('startMarker').value.trim();
+        const endMarker = document.getElementById('endMarker').value.trim();
+        const debugEl = document.getElementById('debugBox');
+
+        if (!raw.trim()) { showToast('Paste a transcript first'); return; }
+
+        const normStart = normalizeText(startMarker);
+        const normEnd = normalizeText(endMarker);
+
+        const startRegex = new RegExp('(' + escapeRegex(normStart).replace(/ /g, '\\s+') + ')', 'i');
+        const endRegex = new RegExp('(' + escapeRegex(normEnd).replace(/ /g, '\\s+') + ')', 'i');
+
+        const startMatch = raw.match(startRegex);
+        const endMatch = raw.match(endRegex);
+
+        let html = '<strong>🔍 Marker Preview:</strong><br><br>';
+
+        if (startMatch) {
+            const ctx = raw.substring(Math.max(0, startMatch.index - 40), startMatch.index + startMatch[0].length + 40);
+            html += `✅ <strong>Start marker found</strong> at position ${startMatch.index}:<br>`;
+            html += `"...${escapeHtml(ctx).replace(escapeHtml(startMatch[0]), `<span class="highlight-found">${escapeHtml(startMatch[0])}</span>`)}..."<br><br>`;
+        } else {
+            html += `❌ <strong>Start marker NOT found:</strong> "${escapeHtml(startMarker)}"<br><br>`;
+        }
+
+        if (endMatch) {
+            const ctx = raw.substring(Math.max(0, endMatch.index - 40), endMatch.index + endMatch[0].length + 40);
+            html += `✅ <strong>End marker found</strong> at position ${endMatch.index}:<br>`;
+            html += `"...${escapeHtml(ctx).replace(escapeHtml(endMatch[0]), `<span class="highlight-found">${escapeHtml(endMatch[0])}</span>`)}..."<br>`;
+        } else {
+            html += `❌ <strong>End marker NOT found:</strong> "${escapeHtml(endMarker)}"<br>`;
+        }
+
+        debugEl.innerHTML = html;
+        debugEl.style.display = 'block';
+    }
+
+    function clearTranscript() {
+        document.getElementById('transcriptInput').value = '';
+        document.getElementById('trimmedOutput').style.display = 'none';
+        document.getElementById('trimStatus').style.display = 'none';
+        document.getElementById('trimError').textContent = '';
+        document.getElementById('debugBox').style.display = 'none';
+        updateCharCount();
+        showToast('Transcript cleared');
+    }
+
+    // ─── Video Functions ───
+    function convertDropboxLink(url) {
+        let converted = url.trim();
+        if (converted.includes('dropbox.com')) {
+            if (converted.includes('dl=0')) converted = converted.replace('dl=0', 'raw=1');
+            else if (converted.includes('dl=1')) converted = converted.replace('dl=1', 'raw=1');
+            else if (!converted.includes('raw=1')) converted += (converted.includes('?') ? '&' : '?') + 'raw=1';
+        }
+        return converted;
+    }
+
+    function loadVideo() {
+        const url = document.getElementById('dropboxLink').value.trim();
+        if (!url) { showToast('Please paste a Dropbox link first'); return; }
+
+        const directUrl = convertDropboxLink(url);
+        const container = document.getElementById('videoContainer');
+        const placeholder = document.getElementById('videoPlaceholder');
+        if (placeholder) placeholder.remove();
+        if (videoElement) videoElement.remove();
+
+        videoElement = document.createElement('video');
+        videoElement.controls = true;
+        videoElement.preload = 'metadata';
+        videoElement.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:#000;';
+
+        const source = document.createElement('source');
+        source.src = directUrl;
+        source.type = 'video/mp4';
+        videoElement.appendChild(source);
+        container.appendChild(videoElement);
+
+        videoElement.addEventListener('timeupdate', () => {
+            currentVideoTime = videoElement.currentTime;
+            document.getElementById('currentTimeDisplay').textContent = formatTime(currentVideoTime);
+        });
+
+        videoElement.addEventListener('loadeddata', () => {
+            document.getElementById('videoStatus').textContent = '● Video loaded';
+            showToast('Video loaded successfully!');
+        });
+
+        videoElement.addEventListener('error', () => {
+            document.getElementById('videoStatus').textContent = '⚠ Load error';
+            container.innerHTML = `
+                <div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ccc;padding:1.5rem;text-align:center;background:#1a1a2e;">
+                    <p>⚠ Direct embed didn't work. Try a public link.</p>
+                    <a href="${url}" target="_blank" style="color:#d4ac0d;margin-top:0.75rem;">Open in Dropbox ↗</a>
+                </div>`;
+        });
+
+        document.getElementById('videoStatus').textContent = '⏳ Loading...';
+    }
+
+    function formatTime(s) {
+        const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+        return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    }
+
+    function parseTime(t) {
+        const p = t.split(':').map(Number);
+        if (p.length === 3) return p[0] * 3600 + p[1] * 60 + p[2];
+        return p[0] * 60 + p[1];
+    }
+
+    // ─── Remark Functions ───
+    function addRemark() {
+        const input = document.getElementById('remarkInput');
+        const text = input.value.trim();
+        if (!text) { showToast('Type a remark first'); return; }
+
+        remarks.push({
+            id: Date.now(),
+            number: remarks.length + 1,
+            timestamp: formatTime(currentVideoTime),
+            rawTime: currentVideoTime,
+            text: text
+        });
+
+        input.value = '';
+        renderRemarks();
+        showToast(`Remark #${remarks.length} added at ${remarks[remarks.length - 1].timestamp}`);
+    }
+
+    function deleteRemark(id) {
+        remarks = remarks.filter(r => r.id !== id);
+        remarks.forEach((r, i) => r.number = i + 1);
+        renderRemarks();
+    }
+
+    function editRemark(id) {
+        const r = remarks.find(r => r.id === id);
+        if (!r) return;
+        const newText = prompt('Edit remark:', r.text);
+        if (newText !== null && newText.trim()) { r.text = newText.trim(); renderRemarks(); }
+    }
+
+    function seekToTime(t) {
+        if (videoElement) { videoElement.currentTime = parseTime(t); videoElement.play(); }
+    }
+
+    function clearRemarks() {
+        if (!remarks.length) return;
+        if (confirm(`Clear all ${remarks.length} remarks?`)) { remarks = []; renderRemarks(); showToast('Cleared'); }
+    }
+
+    function renderRemarks() {
+        const list = document.getElementById('remarksList');
+        const empty = document.getElementById('remarksEmpty');
+        const copyBar = document.getElementById('copyBar');
+        document.getElementById('remarkCount').textContent = `${remarks.length} remark${remarks.length !== 1 ? 's' : ''}`;
+
+        if (!remarks.length) {
+            list.innerHTML = '';
+            empty.style.display = 'block';
+            copyBar.style.display = 'none';
+            return;
+        }
+
+        empty.style.display = 'none';
+        copyBar.style.display = 'flex';
+        document.getElementById('copyStatus').textContent = '';
+
+        list.innerHTML = remarks.map(r => `
+            <li class="remark-item">
+                <span class="remark-number">${r.number}.</span>
+                <span class="remark-timestamp" onclick="seekToTime('${r.timestamp}')" title="Click to seek">${r.timestamp}</span>
+                <span class="remark-text">${escapeHtml(r.text)}</span>
+                <span class="remark-actions">
+                    <button onclick="editRemark(${r.id})" title="Edit">✏️</button>
+                    <button onclick="deleteRemark(${r.id})" title="Delete">🗑</button>
+                </span>
+            </li>
+        `).join('');
+    }
+
+    function insertTimestamp() {
+        const input = document.getElementById('remarkInput');
+        input.value += `[${formatTime(currentVideoTime)}] `;
+        input.focus();
+    }
+
+    function copyRemarks() {
+        if (!remarks.length) { showToast('No remarks to copy'); return; }
+        const text = remarks.map(r => `${r.number}. [${r.timestamp}] ${r.text}`).join('\n');
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied! Paste into WhatsApp');
+            document.getElementById('copyStatus').textContent = '✓ Copied';
+        });
+    }
+
+    function copyTrimmed() {
+        const text = document.getElementById('trimmedText').textContent;
+        if (!text) { showToast('Trim a transcript first'); return; }
+        navigator.clipboard.writeText(text).then(() => showToast('Trimmed transcript copied!'));
+    }
+
+    function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(t._to);
+        t._to = setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ─── Keyboard Shortcuts ───
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && e.key === 'Enter' && document.activeElement.id === 'remarkInput') { e.preventDefault(); addRemark(); }
+        if (e.ctrlKey && e.key === 't') { e.preventDefault(); insertTimestamp(); }
+    });
+
+    document.getElementById('dropboxLink').addEventListener('paste', () => {
+        setTimeout(() => { if (document.getElementById('dropboxLink').value.includes('dropbox.com')) loadVideo(); }, 100);
+    });
+
+    renderRemarks();
+</script>
+</body>
+</html>
