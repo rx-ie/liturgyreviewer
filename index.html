@@ -43,7 +43,7 @@
         header h1 { font-size: 1.5rem; font-weight: 600; }
         header p { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
 
         .link-input-section {
             background: var(--card-bg);
@@ -83,8 +83,8 @@
         .btn-danger { background: var(--accent); color: white; }
         .btn-danger:hover { background: #a93226; }
 
-        .main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr; } }
+        /* Changed from 2 columns to 1 column to make the video larger and place remarks below */
+        .main-layout { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 
         .panel {
             background: var(--card-bg); border-radius: 12px;
@@ -101,7 +101,7 @@
         .panel-body { padding: 1.25rem; flex: 1; overflow-y: auto; }
 
         .video-container {
-            position: relative; width: 100%; padding-top: 56.25%;
+            position: relative; width: 100%; padding-top: 56.25%; /* Maintains 16:9 Aspect Ratio */
             background: #1a1a2e; border-radius: 8px; overflow: hidden; margin-bottom: 1rem;
         }
 
