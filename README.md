@@ -22,7 +22,7 @@ A lightweight, single-page web tool for reviewing daily parish liturgy videos.
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
-|---|---|
+| --- | --- |
 | `Ctrl + Enter` | Add remark (when typing in remark box) |
 | `Ctrl + T` | Grab current video timestamp |
 
