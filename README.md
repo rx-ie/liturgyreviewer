@@ -4,10 +4,10 @@ A lightweight, single-page web tool for reviewing daily parish liturgy videos.
 
 ## Features
 
-- **Video Player** — Load Dropbox video links directly in the browser
-- **Timestamped Remarks** — Add remarks tied to specific video timestamps
-- **One-Click Copy** — Copy all remarks formatted for WhatsApp
-- **Transcript Trimmer** — Extract homily sections from full transcripts using:
+- **Video Player** - Load Dropbox video links directly in the browser
+- **Timestamped Remarks** - Add remarks tied to specific video timestamps
+- **One-Click Copy** - Copy all remarks formatted for WhatsApp
+- **Transcript Trimmer** - Extract homily sections from full transcripts using:
   - Text markers (e.g., "the gospel of the lord" → "our father who art in heaven")
   - Line number ranges
   - Manual text selection
