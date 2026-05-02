@@ -28,6 +28,7 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  line-height: 1.5;
 }
 
 header {
@@ -43,6 +44,7 @@ header {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 header .cross {
@@ -53,12 +55,13 @@ header .cross {
 header h1 {
   font-size: 1.5rem;
   font-weight: 600;
+  margin: 0;
 }
 
 header p {
   font-size: 0.85rem;
   opacity: 0.85;
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 
 .container {
@@ -92,7 +95,7 @@ header p {
   border: 2px solid var(--border);
   border-radius: 8px;
   font-size: 0.95rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s ease;
 }
 
 .link-input-section input:focus {
@@ -107,10 +110,15 @@ header p {
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .btn-primary {
@@ -159,7 +167,7 @@ header p {
   background: #a93226;
 }
 
-/* Changed from 2 columns to 1 column to make the video larger and place remarks below */
+/* Use 1 column to make the video larger and place remarks below */
 .main-layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -185,6 +193,7 @@ header p {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .panel-body {
@@ -210,7 +219,7 @@ header p {
   left: 0;
   width: 100%;
   height: 100%;
-  border: none;
+  border: 0;
 }
 
 .video-placeholder {
@@ -259,6 +268,7 @@ header p {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .remark-input-area textarea {
@@ -270,7 +280,7 @@ header p {
   font-family: inherit;
   resize: vertical;
   min-height: 60px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s ease;
 }
 
 .remark-input-area textarea:focus {
@@ -293,7 +303,7 @@ header p {
   background: #fafafa;
   border-radius: 8px;
   border-left: 3px solid var(--primary);
-  transition: background 0.15s;
+  transition: background 0.15s ease;
 }
 
 .remark-item:hover {
@@ -312,11 +322,14 @@ header p {
   font-size: 0.8rem;
   color: var(--accent);
   background: #fdecea;
-  padding: 2px 8px;
+  padding: 0.125rem 0.5rem;
   border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
   font-weight: 600;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .remark-timestamp:hover {
@@ -335,10 +348,10 @@ header p {
   border: none;
   cursor: pointer;
   font-size: 0.85rem;
-  padding: 2px 6px;
+  padding: 0.125rem 0.375rem;
   border-radius: 4px;
   opacity: 0.5;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
 .remark-actions button:hover {
@@ -353,6 +366,7 @@ header p {
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 
 .transcript-textarea {
@@ -365,7 +379,7 @@ header p {
   font-family: inherit;
   line-height: 1.6;
   resize: vertical;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s ease;
 }
 
 .transcript-textarea:focus {
@@ -392,7 +406,7 @@ header p {
   color: var(--primary-dark);
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 0.1875rem 0.625rem;
   border-radius: 4px;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
@@ -476,10 +490,11 @@ kbd {
   background: #eee;
   border: 1px solid #ccc;
   border-radius: 3px;
-  padding: 1px 6px;
+  padding: 0.0625rem 0.375rem;
   font-size: 0.78rem;
   font-family: "Courier New", monospace;
   color: #555;
+  display: inline-block;
 }
 
 .shortcuts-hint {
@@ -525,7 +540,7 @@ kbd {
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   background: white;
   color: var(--primary);
   border: none;
@@ -538,6 +553,12 @@ kbd {
 
 .trim-tab:hover:not(.active) {
   background: #f4f0f7;
+}
+
+/* Focus style for tabs */
+.trim-tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
 }
 
 .trim-mode-panel {
@@ -563,7 +584,7 @@ kbd {
 
 .highlight-found {
   background: #abebc6;
-  padding: 1px 4px;
+  padding: 0.0625rem 0.25rem;
   border-radius: 2px;
 }
 
@@ -574,7 +595,7 @@ kbd {
 .manual-trim-row {
   display: flex;
   gap: 0.75rem;
-  align-items: end;
+  align-items: flex-end;
   flex-wrap: wrap;
   margin-bottom: 0.75rem;
 }
@@ -604,4 +625,29 @@ kbd {
   color: var(--text-light);
   text-align: right;
   margin-top: 0.25rem;
+}
+
+/* Media query for better mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .custom-marker-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .copy-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    justify-content: center;
+  }
 }
