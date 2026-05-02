@@ -905,7 +905,7 @@
       let videoElement = null;
       let currentTrimMode = "markers";
 
-      // ─── Trim Mode Switching ───
+      // --- Trim Mode Switching ---
       function switchTrimMode(mode) {
         currentTrimMode = mode;
         document
@@ -924,7 +924,7 @@
         else if (currentTrimMode === "selection") trimBySelection();
       }
 
-      // ─── Transcript character/word counter ───
+      // --- Transcript character/word counter ---
       document.addEventListener("DOMContentLoaded", () => {
         const ta = document.getElementById("transcriptInput");
         ta.addEventListener("input", updateCharCount);
@@ -939,7 +939,7 @@
           `${chars} characters · ${words} words · ${lines} lines`;
       }
 
-      // ─── TRIM MODE 1: By Markers (FIXED) ───
+      // --- TRIM MODE 1: By Markers (FIXED) ---
       function normalizeText(text) {
         return text
           .toLowerCase()
@@ -1092,7 +1092,7 @@
         debugEl.style.display = "block";
       }
 
-      // ─── TRIM MODE 2: By Line Numbers ───
+      // --- TRIM MODE 2: By Line Numbers ---
       function countLines() {
         const raw = document.getElementById("transcriptInput").value;
         if (!raw.trim()) {
@@ -1143,7 +1143,7 @@
         displayTrimmedResult(trimmed);
       }
 
-      // ─── TRIM MODE 3: Manual Selection ───
+      // --- TRIM MODE 3: Manual Selection ---
       function trimBySelection() {
         const ta = document.getElementById("transcriptInput");
         const errorEl = document.getElementById("trimError");
@@ -1167,7 +1167,7 @@
         displayTrimmedResult(trimmed);
       }
 
-      // ─── Shared result display ───
+      // --- Shared result display ---
       function displayTrimmedResult(trimmed) {
         const outputEl = document.getElementById("trimmedOutput");
         const textEl = document.getElementById("trimmedText");
@@ -1188,7 +1188,7 @@
         showToast("Transcript trimmed successfully!");
       }
 
-      // ─── Preview Markers ───
+      // --- Preview Markers ---
       function previewMarkers() {
         const raw = document.getElementById("transcriptInput").value;
         const startMarker = document.getElementById("startMarker").value.trim();
@@ -1253,7 +1253,7 @@
         showToast("Transcript cleared");
       }
 
-      // ─── Video Functions ───
+      // --- Video Functions ---
       function convertDropboxLink(url) {
         let converted = url.trim();
         if (converted.includes("dropbox.com")) {
@@ -1327,7 +1327,7 @@
         return p[0] * 60 + p[1];
       }
 
-      // ─── Remark Functions ───
+      // --- Remark Functions ---
       function addRemark() {
         const input = document.getElementById("remarkInput");
         const text = input.value.trim();
@@ -1463,7 +1463,7 @@
         t._to = setTimeout(() => t.classList.remove("show"), 2500);
       }
 
-      // ─── Keyboard Shortcuts ───
+      // --- Keyboard Shortcuts ---
       document.addEventListener("keydown", (e) => {
         if (
           e.ctrlKey &&
