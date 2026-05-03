@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parish Liturgy Video Reviewer</title>
+  <link rel="stylesheet" href="styles.css" type="text/css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <span class="cross">✝</span>
+    <div>
+      <h1>Parish Liturgy Video Reviewer</h1>
+      <p>
+        Review daily liturgy videos · Compile timestamped remarks · Extract
+        homily transcripts
+      </p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="link-input-section">
+      <label>📎 Dropbox Link:</label>
+      <input type="text" id="dropboxLink" placeholder="Paste your Dropbox video link here...">
+      <button class="btn btn-primary" onclick="loadVideo()">
+        ▶ Load Video
+      </button>
+    </div>
+
+    <div class="main-layout">
+      <div class="panel">
+        <div class="panel-header">
+          <span>🎬 Video Player</span>
+          <span id="videoStatus" style="font-size: 0.8rem; opacity: 0.8">No video loaded</span>
+        </div>
+        <div class="panel-body">
+          <div class="video-container" id="videoContainer">
+            <div class="video-placeholder" id="videoPlaceholder">
+              <span class="icon-big">🎥</span>
+              <p>
+                Paste a Dropbox link above and click
+                <strong>Load Video</strong>
+              </p>
+            </div>
+          </div>
+          <div class="current-time-display">
+            <div>
+              <div class="label">CURRENT TIME</div>
+              <div class="time" id="currentTimeDisplay">00:00</div>
+            </div>
+            <div style="flex: 1"></div>
+            <button class="btn btn-sm btn-outline" onclick="insertTimestamp()">
+              ⏱ Grab Timestamp
+            </button>
+          </div>
+          <div class="shortcuts-hint" style="margin-top: 0.75rem">
+            💡 <kbd>Ctrl</kbd>+<kbd>Enter</kbd> add remark ·
+            <kbd>Ctrl</kbd>+<kbd>T</kbd> grab timestamp
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span>📝 Remarks</span>
+          <span style="font-size: 0.8rem; opacity: 0.8" id="remarkCount">0 remarks</span>
+        </div>
+        <div class="panel-body">
+          <div class="remark-input-area">
+            <textarea id="remarkInput" placeholder="Type your remark here... (Ctrl+Enter to add)" rows="2"></textarea>
+            <div style="display: flex; flex-direction: column; gap: 0.35rem">
+              <button class="btn btn-primary btn-sm" onclick="addRemark()">
+                + Add
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="clearRemarks()">
+                🗑
+              </button>
+            </div>
+          </div>
+          <ol class="remarks-list" id="remarksList"></ol>
+          <div class="empty-state" id="remarksEmpty">
+            <div class="icon-big">📋</div>
+            <p>No remarks yet. Start reviewing!</p>
+          </div>
+          <div class="copy-bar" id="copyBar" style="display: none">
+            <button class="btn btn-whatsapp" onclick="copyRemarks()">
+              📋 Copy to WhatsApp
+            </button>
+            <span style="font-size: 0.82rem; color: var(--text-light)" id="copyStatus"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-panels">
+      <div class="panel">
+        <div class="panel-header">
+          <span>📜 Transcript Trimmer — Extract Homily</span>
+          <button class="btn btn-sm" style="background: rgba(255, 255, 255, 0.2); color: white"
+            onclick="activeTrimmingAction()">
+            ✂ Trim
+          </button>
+        </div>
+        <div class="panel-body">
+          <!-- Trim mode tabs -->
+          <div class="trim-tabs">
+            <button class="trim-tab active" onclick="switchTrimMode('markers')">
+              🔖 By Markers
+            </button>
+            <button class="trim-tab" onclick="switchTrimMode('lines')">
+              📏 By Line Numbers
+            </button>
+            <button class="trim-tab" onclick="switchTrimMode('selection')">
+              ✋ Manual Select
+            </button>
+          </div>
+
+          <!-- MODE 1: Marker-based -->
+          <div class="trim-mode-panel active" id="trimMode_markers">
+            <div class="trim-markers">
+              <div>
+                <strong>Start marker:</strong> Text <em>after</em> this phrase
+                is kept
+              </div>
+              <div>
+                <strong>End marker:</strong> Text <em>before</em> this phrase
+                is kept
+              </div>
+              <div style="margin-top: 0.5rem">
+                <div class="custom-marker-inputs">
+                  <input type="text" id="startMarker" value="the gospel of the lord" placeholder="Start phrase...">
+                  <input type="text" id="endMarker" value="our father who art in heaven" placeholder="End phrase...">
+                </div>
+              </div>
+              <div style="
+                    margin-top: 0.5rem;
+                    font-size: 0.78rem;
+                    color: var(--text-light);
+                  ">
+                💡 Matching is case-insensitive and ignores extra spaces. You
+                can use partial phrases.
+              </div>
+            </div>
+          </div>
+
+          <!-- MODE 2: Line numbers -->
+          <div class="trim-mode-panel" id="trimMode_lines">
+            <div class="trim-markers">
+              <div><strong>Extract by line numbers:</strong></div>
+              <div class="manual-trim-row" style="margin-top: 0.5rem">
+                <div>
+                  <label>From line:</label><br>
+                  <input type="number" id="lineStart" value="1" min="1">
+                </div>
+                <div>
+                  <label>To line:</label><br>
+                  <input type="number" id="lineEnd" value="50" min="1">
+                </div>
+                <button class="btn btn-sm btn-outline" onclick="countLines()">
+                  📊 Count Lines
+                </button>
+              </div>
+              <div id="lineCountInfo" style="font-size: 0.78rem; color: var(--text-light)"></div>
+            </div>
+          </div>
+
+          <!-- MODE 3: Manual selection -->
+          <div class="trim-mode-panel" id="trimMode_selection">
+            <div class="trim-markers">
+              <div>
+                <strong>Manual selection:</strong> Highlight text in the box
+                below, then click "Trim Selected"
+              </div>
+              <div style="
+                    font-size: 0.78rem;
+                    color: var(--text-light);
+                    margin-top: 0.3rem;
+                  ">
+                💡 Select (highlight) exactly the part you want to extract,
+                then click the button.
+              </div>
+            </div>
+          </div>
+
+          <textarea class="transcript-textarea" id="transcriptInput"
+            placeholder="Paste the full Dropbox transcript here..."></textarea>
+          <div class="char-count" id="charCount">
+            0 characters · 0 words · 0 lines
+          </div>
+
+          <div style="
+                display: flex;
+                gap: 0.5rem;
+                margin-top: 0.75rem;
+                flex-wrap: wrap;
+              ">
+            <button class="btn btn-primary btn-sm" onclick="activeTrimmingAction()">
+              ✂ Trim Transcript
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="copyTrimmed()">
+              📋 Copy Trimmed
+            </button>
+            <button class="btn btn-sm" style="background: #eee; color: #555" onclick="previewMarkers()">
+              🔍 Preview Matches
+            </button>
+            <button class="btn btn-sm btn-danger" style="margin-left: auto" onclick="clearTranscript()">
+              🗑 Clear
+            </button>
+          </div>
+
+          <div id="debugBox" class="debug-box" style="display: none"></div>
+          <div id="trimmedOutput" style="display: none" class="trimmed-output">
+            <div class="label-badge">✝ Homily Section</div>
+            <div id="trimmedText"></div>
+          </div>
+          <div id="trimError" class="error-msg"></div>
+          <div class="status-bar" id="trimStatus" style="display: none">
+            <span class="dot"></span>
+            <span id="trimStatusText"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</body>
+
+</html>
